@@ -11,5 +11,5 @@ func (revC revCommand) Execute(loop engine.Handler) {
 	for _, v := range revC {
 		result = string(v) + result
 	}
-	loop.Post(&printCommand(result))
+	loop.Post(printCommand(result))
 }
