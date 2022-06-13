@@ -24,7 +24,7 @@ func (cq *commandsQueue) pull() Command {
 	cq.mu.Lock()
 	defer cq.mu.Unlock()
 
-	if len(cq.cmdArray == 0) {
+	if len(cq.cmdArray) == 0 {
 		cq.wait = true
 		cq.mu.Unlock()
 		<-cq.notEmpty

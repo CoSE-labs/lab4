@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/CoSE-labs/lab4/engine"
+	engine "github.com/CoSE-labs/lab4/engine"
 )
 
 type revCommand string
