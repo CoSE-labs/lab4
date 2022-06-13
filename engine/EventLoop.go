@@ -55,7 +55,7 @@ func (loop *EventLoop) Start() {
 	}
 	loop.stopSignal = make(chan struct{})
 	go func() {
-		for loop.stop != true && loop.queue.empty() {
+		for !loop.stop || !loop.queue.empty() {
 			cmd := loop.queue.pull()
 			cmd.Execute(loop)
 		}
