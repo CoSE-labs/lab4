@@ -6,8 +6,10 @@ import (
 	"github.com/CoSE-labs/lab4/engine"
 )
 
-type printCommand string
+type printCommand struct {
+	line string
+}
 
 func (p printCommand) Execute(hand engine.Handler) {
-	fmt.Println(string(p))
+	fmt.Println(p.line)
 }

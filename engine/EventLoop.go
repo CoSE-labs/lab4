@@ -3,50 +3,62 @@ package engine
 import "sync"
 
 type commandsQueue struct {
-	mu       sync.Mutex
+	sync.Mutex
+
 	cmdArray []Command
 	wait     bool
-
 	notEmpty chan struct{}
 }
 
+type cmdExecutor struct {
+	executor func()
+}
+
+type EventLoop struct {
+	queue      *commandsQueue
+	stop       bool
+	stopSignal chan struct{}
+}
+
 func (cq *commandsQueue) push(cmd Command) {
-	cq.mu.Lock()
-	defer cq.mu.Unlock()
+	cq.Lock()
+	defer cq.Unlock()
 
 	cq.cmdArray = append(cq.cmdArray, cmd)
+
 	if cq.wait {
+		cq.wait = false
 		cq.notEmpty <- struct{}{}
 	}
 }
 
 func (cq *commandsQueue) pull() Command {
-	cq.mu.Lock()
-	defer cq.mu.Unlock()
+	cq.Lock()
+	defer cq.Unlock()
 
 	if len(cq.cmdArray) == 0 {
 		cq.wait = true
-		cq.mu.Unlock()
+		cq.Unlock()
 		<-cq.notEmpty
-		cq.mu.Lock()
+		cq.Lock()
 	}
+
 	res := cq.cmdArray[0]
 	cq.cmdArray[0] = nil
 	cq.cmdArray = cq.cmdArray[1:]
+
 	return res
 }
 
-func (cq *commandsQueue) empty() bool {
-	cq.mu.Lock()
-	defer cq.mu.Unlock()
-	return len(cq.cmdArray) == 0
+func (cq *commandsQueue) empty() int {
+	cq.Lock()
+	defer cq.Unlock()
+
+	return len(cq.cmdArray)
 }
 
-type EventLoop struct {
-	queue *commandsQueue
-
-	stop       bool
-	stopSignal chan struct{}
+func (ce *cmdExecutor) Execute(h Handler) {
+	ce.executor()
 }
 
 func (loop *EventLoop) Start() {
@@ -54,13 +66,13 @@ func (loop *EventLoop) Start() {
 		notEmpty: make(chan struct{}),
 	}
 	loop.stopSignal = make(chan struct{})
+
 	go func() {
-		for !loop.stop || !loop.queue.empty() {
+		for !(loop.stop && loop.queue.empty() == 0) {
 			cmd := loop.queue.pull()
 			cmd.Execute(loop)
 		}
 		loop.stopSignal <- struct{}{}
-
 	}()
 }
 
@@ -68,15 +80,9 @@ func (loop *EventLoop) Post(cmd Command) {
 	loop.queue.push(cmd)
 }
 
-type CommandFunc func(h Handler)
-
-func (cf CommandFunc) Execute(hand Handler) {
-	cf(hand)
-}
-
 func (loop *EventLoop) AwaitFinish() {
-	loop.Post(CommandFunc(func(h Handler) {
-		loop.stop = true
-	}))
+	finish := &cmdExecutor{func() { loop.stop = true }}
+	loop.Post(finish)
+
 	<-loop.stopSignal
 }

@@ -1,0 +1,6 @@
+print HelloWorld
+add time
+print testing_lab4
+print arg1 arg2
+reverse bg gh ji
+reverse github
