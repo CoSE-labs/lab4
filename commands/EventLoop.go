@@ -1,11 +1,11 @@
-package engine
+package commands
 
 import "sync"
 
 type commandsQueue struct {
 	sync.Mutex
 
-	cmdArray []Command
+	CmdArray []Command
 	wait     bool
 	notEmpty chan struct{}
 }
@@ -24,7 +24,7 @@ func (cq *commandsQueue) push(cmd Command) {
 	cq.Lock()
 	defer cq.Unlock()
 
-	cq.cmdArray = append(cq.cmdArray, cmd)
+	cq.CmdArray = append(cq.CmdArray, cmd)
 
 	if cq.wait {
 		cq.wait = false
@@ -36,16 +36,16 @@ func (cq *commandsQueue) pull() Command {
 	cq.Lock()
 	defer cq.Unlock()
 
-	if len(cq.cmdArray) == 0 {
+	if len(cq.CmdArray) == 0 {
 		cq.wait = true
 		cq.Unlock()
 		<-cq.notEmpty
 		cq.Lock()
 	}
 
-	res := cq.cmdArray[0]
-	cq.cmdArray[0] = nil
-	cq.cmdArray = cq.cmdArray[1:]
+	res := cq.CmdArray[0]
+	cq.CmdArray[0] = nil
+	cq.CmdArray = cq.CmdArray[1:]
 
 	return res
 }
@@ -54,7 +54,7 @@ func (cq *commandsQueue) empty() int {
 	cq.Lock()
 	defer cq.Unlock()
 
-	return len(cq.cmdArray)
+	return len(cq.CmdArray)
 }
 
 func (ce *cmdExecutor) Execute(h Handler) {
