@@ -1,17 +1,13 @@
 package commands
 
-import (
-	"github.com/CoSE-labs/lab4/engine"
-)
-
-type revCommand struct {
+type RevCommand struct {
 	arg string
 }
 
-func (revC *revCommand) Execute(loop engine.Handler) {
+func (revC *RevCommand) Execute(loop Handler) {
 	var result string
 	for _, v := range revC.arg {
 		result = string(v) + result
 	}
-	loop.Post(&printCommand{line: result})
+	loop.Post(&PrintCommand{line: result})
 }
