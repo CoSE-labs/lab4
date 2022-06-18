@@ -2,14 +2,12 @@ package commands
 
 import (
 	"fmt"
-
-	"github.com/CoSE-labs/lab4/engine"
 )
 
-type printCommand struct {
+type PrintCommand struct {
 	line string
 }
 
-func (p printCommand) Execute(hand engine.Handler) {
+func (p PrintCommand) Execute(hand Handler) {
 	fmt.Println(p.line)
 }

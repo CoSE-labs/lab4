@@ -2,15 +2,13 @@ package commands
 
 import (
 	"strings"
-
-	"github.com/CoSE-labs/lab4/engine"
 )
 
-func Parse(fileline string) engine.Command {
+func Parse(fileline string) Command {
 	getParts := strings.Fields(fileline)
 
 	if len(getParts) != 2 {
-		return &printCommand{line: "Syntax Error: invalid number of arguments"}
+		return &PrintCommand{line: "Syntax Error: invalid number of arguments"}
 	}
 
 	com := getParts[0]
@@ -18,10 +16,10 @@ func Parse(fileline string) engine.Command {
 
 	switch com {
 	case "print":
-		return &printCommand{line: argument}
+		return &PrintCommand{line: argument}
 	case "reverse":
-		return &revCommand{arg: argument}
+		return &RevCommand{arg: argument}
 	default:
-		return &printCommand{line: "Syntax Error: unknown command"}
+		return &PrintCommand{line: "Syntax Error: unknown command"}
 	}
 }
