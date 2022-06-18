@@ -1,8 +1,8 @@
 package main
 
 import (
+	"fmt"
 	"bufio"
-	"log"
 	"os"
 
 	"github.com/CoSE-labs/lab4/commands"
@@ -12,7 +12,7 @@ import (
 func main() {
 	file, err := os.Open("./inputFile.txt")
 	if err != nil {
-		log.Fatal("Unable to open file, %s", err)
+		fmt.Println("Unable to open file, ", err)
 	}
 	defer file.Close()
 
@@ -27,7 +27,7 @@ func main() {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal("Unable to read file, %s", err)
+		fmt.Println("Unable to read file, ", err)
 	}
 	eventLoop.AwaitFinish()
 }
