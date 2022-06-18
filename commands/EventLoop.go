@@ -5,7 +5,7 @@ import "sync"
 type commandsQueue struct {
 	sync.Mutex
 
-	CmdArray []Command
+//	CmdArray []Command
 	wait     bool
 	notEmpty chan struct{}
 }
